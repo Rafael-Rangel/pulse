@@ -13,7 +13,9 @@ export default function CalendarioPage() {
   const [dias, setDias] = useState<DiaCalendario[]>([]);
 
   useEffect(() => {
-    fetch("/api/calendario")
+    const now = new Date();
+    const hoje = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    fetch(`/api/calendario?hoje=${hoje}`)
       .then((r) => r.json())
       .then((data) => setDias(data.dias ?? []))
       .catch(() => setDias([]));

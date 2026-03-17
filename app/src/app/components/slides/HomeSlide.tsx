@@ -175,17 +175,16 @@ export default function HomeSlide() {
         <section className="animate-in stagger-7">
           <h2 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Ações rápidas</h2>
           <div className="space-y-2">
-            <button
-              type="button"
-              onClick={() => goTo(1)}
+            <Link
+              href="/lancamentos?openForm=1"
               className="btn-interactive w-full flex items-center justify-between rounded-xl bg-surface border border-[var(--color-border)] p-4 hover:bg-[var(--color-surface-elevated)] transition-colors duration-[150ms] group text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-primary/20 text-primary"><PlusCircle className="size-5" aria-hidden /></div>
-                <span className="font-medium">Anotar gasto ou receita</span>
+                <span className="font-medium">Anotar gasto</span>
               </div>
               <ChevronRight className="size-5 text-[var(--color-text-muted)] group-hover:text-primary transition-colors" />
-            </button>
+            </Link>
             <Link
               href="/calendario"
               className="btn-interactive flex items-center justify-between rounded-xl bg-surface border border-[var(--color-border)] p-4 hover:bg-[var(--color-surface-elevated)] transition-colors duration-[150ms] group"

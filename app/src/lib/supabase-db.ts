@@ -26,24 +26,32 @@ export function hasSupabaseConfig(): boolean {
   );
 }
 
+/** Formata data em YYYY-MM-DD usando o fuso local (evita erro de dia com UTC). */
+function toLocalDateString(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function getDataInicioFim(ano: number, mes: number): { data_inicio: string; data_fim: string } {
   const dataInicio = `${ano}-${String(mes).padStart(2, "0")}-01`;
-  const lastDay = new Date(ano, mes, 0);
-  const dataFim = lastDay.toISOString().slice(0, 10);
+  const lastDay = new Date(ano, mes, 0); // último dia do mês (local)
+  const dataFim = toLocalDateString(lastDay);
   return { data_inicio: dataInicio, data_fim: dataFim };
 }
 
-/** Período do calendário: de hoje até o próximo dia 10 (salário). */
+/** Período do calendário: do dia de hoje (local) até o próximo dia 10 (salário). */
 export function getPeriodoAteProximoDia10(): { data_inicio: string; data_fim: string } {
   const now = new Date();
-  const dataInicio = now.toISOString().slice(0, 10);
+  const dataInicio = toLocalDateString(now);
   let next10: Date;
   if (now.getDate() < 10) {
     next10 = new Date(now.getFullYear(), now.getMonth(), 10);
   } else {
     next10 = new Date(now.getFullYear(), now.getMonth() + 1, 10);
   }
-  const dataFim = next10.toISOString().slice(0, 10);
+  const dataFim = toLocalDateString(next10);
   return { data_inicio: dataInicio, data_fim: dataFim };
 }
 
@@ -113,7 +121,7 @@ export async function getConfig(ano: number, mes: number): Promise<ConfigMes | n
   if (errMes || !mesRow) return null;
 
   const now = new Date();
-  const today = now.toISOString().slice(0, 10);
+  const today = toLocalDateString(now);
   const isCurrentMonth = mesRow.ano === now.getFullYear() && mesRow.mes === now.getMonth() + 1;
   const dataFimStored = String(mesRow.data_fim).slice(0, 10);
   const dataInicioStored = String(mesRow.data_inicio).slice(0, 10);

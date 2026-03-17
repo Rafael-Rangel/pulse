@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Nav from "../components/Nav";
 import { Wallet, PlusCircle, List, ChevronDown, X, Pencil, Trash2 } from "lucide-react";
 import { CATEGORIAS, TIPOS_LANCAMENTO, MEIOS_PAGAMENTO } from "@/lib/types";
@@ -24,6 +25,7 @@ function groupByData(list: Lancamento[]): { data: string; items: Lancamento[] }[
 
 function LancamentosPageInner(props: { embedded?: boolean }) {
   const { embedded } = props;
+  const searchParams = useSearchParams();
   const [list, setList] = useState<Lancamento[]>([]);
   const [categoriasList, setCategoriasList] = useState<string[]>([]);
   const [form, setForm] = useState<Partial<Lancamento>>({
@@ -40,6 +42,11 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
   useEffect(() => {
     load();
   }, []);
+
+  // Abrir o formulário ao vir por link "Anotar gasto" (ex.: /lancamentos?openForm=1)
+  useEffect(() => {
+    if (searchParams.get("openForm") === "1") setShowForm(true);
+  }, [searchParams]);
 
   useEffect(() => {
     fetch("/api/categorias")
@@ -131,7 +138,7 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
           {editingId ? (
             <> <Pencil className="size-4 shrink-0 text-primary" aria-hidden /> Editar lançamento </>
           ) : (
-            <> <PlusCircle className="size-4 shrink-0 text-primary" aria-hidden /> Novo gasto ou receita </>
+            <> <PlusCircle className="size-4 shrink-0 text-primary" aria-hidden /> Novo gasto </>
           )}
         </h2>
         <button type="button" onClick={closeForm} className="btn-interactive p-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]" aria-label="Fechar">
@@ -237,7 +244,7 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
               className="animate-in stagger-3 btn-interactive w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-dashed border-primary/50 text-primary hover:bg-primary/10 transition-colors font-semibold"
             >
               <PlusCircle className="size-5" aria-hidden />
-              Anotar gasto ou receita
+              Anotar gasto
               <ChevronDown className="size-5 rotate-[-90deg]" aria-hidden />
             </button>
           )}
@@ -258,7 +265,7 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
         {showForm ? formBlock : (
           <button type="button" onClick={() => setShowForm(true)} className="animate-in stagger-3 btn-interactive w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-dashed border-primary/50 text-primary hover:bg-primary/10 transition-colors font-semibold">
             <PlusCircle className="size-5" aria-hidden />
-            Anotar gasto ou receita
+            Anotar gasto
             <ChevronDown className="size-5 rotate-[-90deg]" aria-hidden />
           </button>
         )}
