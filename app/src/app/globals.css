@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== DESIGN SYSTEM — Pulse (preto, amarelo, branco) ========== */
+:root {
+  /* Cores principais */
+  --color-primary: #facc15;
+  --color-primary-hover: #eab308;
+  --color-primary-muted: #fef08a;
+  --color-secondary: #ffffff;
+  --color-secondary-hover: #f5f5f5;
+
+  /* Semânticas */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Neutros (preto e branco) */
+  --color-bg: #000000;
+  --color-surface: #171717;
+  --color-surface-elevated: #262626;
+  --color-border: #404040;
+  --color-text: #fafafa;
+  --color-text-muted: #a3a3a3;
+  --color-text-subtle: #737373;
+
+  /* Espaço (base 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-fab: 0 4px 16px rgba(250, 204, 21, 0.4);
+
+  /* Animação */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --easing: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ========== Animações ========== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Entrada de página (conteúdo principal) */
+.animate-page-enter {
+  animation: fadeIn var(--duration-normal) var(--easing-out) forwards;
+}
+
+.animate-in {
+  animation: slideUp 0.4s var(--easing-out) forwards;
+}
+
+.animate-in-right {
+  animation: slideInRight 0.35s var(--easing-out) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s var(--easing-out) forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.35s var(--easing-out) forwards;
+}
+
+.animate-panel-in {
+  animation: fadeScaleIn 0.35s var(--easing-out) forwards;
+}
+
+/* Stagger: atraso por filho (use em filhos) */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+.stagger-7 { animation-delay: 350ms; }
+.stagger-8 { animation-delay: 400ms; }
+.stagger-9 { animation-delay: 450ms; }
+.stagger-10 { animation-delay: 500ms; }
+
+/* Inicialmente invisível para animação */
+.animate-in,
+.animate-in-right,
+.animate-scale-in,
+.animate-slide-down,
+.animate-panel-in {
+  opacity: 0;
+}
+
+/* Botões e links interativos: feedback ao toque */
+.btn-interactive {
+  transition: transform var(--duration-fast) var(--easing), box-shadow var(--duration-fast) var(--easing);
+}
+.btn-interactive:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-enter,
+  .animate-in,
+  .animate-in-right,
+  .animate-scale-in,
+  .animate-slide-down,
+  .animate-panel-in,
+  .skeleton {
+    animation: none;
+  }
+  .animate-in,
+  .animate-in-right,
+  .animate-scale-in,
+  .animate-slide-down,
+  .animate-panel-in {
+    opacity: 1;
+    transform: none;
+  }
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5,
+  .stagger-6, .stagger-7, .stagger-8, .stagger-9, .stagger-10 {
+    animation-delay: 0ms;
+  }
+  .btn-interactive:active {
+    transform: none;
+  }
+}
+
+/* Skeleton com shimmer (loading) */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-elevated) 0%,
+    var(--color-surface) 50%,
+    var(--color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Tipografia — tabular numbers para valores. html preenche a viewport para o fundo; body segue a altura do conteúdo. */
+@layer base {
+  html {
+    min-height: 100%;
+    background: var(--color-bg);
+  }
+  body {
+    @apply antialiased;
+    color: var(--color-text);
+    background: var(--color-bg);
+    font-feature-settings: "tnum" 1;
+    min-height: 0;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
