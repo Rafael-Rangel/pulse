@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Nav from "../components/Nav";
 import { MessageCircle, Send, Check, AlertCircle, Mic, MicOff } from "lucide-react";
 import type { ConfigMes, SuggestedAction } from "@/lib/types";
@@ -14,7 +14,8 @@ interface ChatMessage {
   suggestedActions?: SuggestedAction[];
 }
 
-export default function IAPage({ embedded }: { embedded?: boolean } = {}) {
+function IAPageInner(props: { embedded?: boolean }) {
+  const { embedded } = props;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversaId, setConversaId] = useState<number | null>(null);
   const [input, setInput] = useState("");
@@ -388,3 +389,8 @@ export default function IAPage({ embedded }: { embedded?: boolean } = {}) {
     </div>
   );
 }
+
+function IAPage(props: { embedded?: boolean } & Record<string, unknown>) {
+  return <IAPageInner embedded={"embedded" in props ? props.embedded : undefined} />;
+}
+export default IAPage as React.FC;

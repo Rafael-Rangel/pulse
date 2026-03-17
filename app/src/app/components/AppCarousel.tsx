@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Home,
   Wallet,
@@ -10,19 +11,20 @@ import {
   MessageCircle,
   Settings,
 } from "lucide-react";
-import { CarouselProvider, useCarousel } from "@/app/context/CarouselContext";
+import { CarouselProvider } from "@/app/context/CarouselContext";
 import HomeSlide from "./slides/HomeSlide";
 import LancamentosPage from "@/app/lancamentos/page";
 import ResumoPage from "@/app/resumo/page";
 import GraficosPage from "@/app/graficos/page";
 import IAPage from "@/app/ia/page";
 
+type EmbeddedSlideComponent = React.ComponentType<{ embedded?: boolean }>;
 const SLIDES = [
-  { id: "home", label: "Início", icon: Home, component: HomeSlide },
-  { id: "lancamentos", label: "Lançamentos", icon: Wallet, component: LancamentosPage },
-  { id: "resumo", label: "Resumo", icon: PieChart, component: ResumoPage },
-  { id: "graficos", label: "Gráficos", icon: BarChart2, component: GraficosPage },
-  { id: "ia", label: "IA", icon: MessageCircle, component: IAPage },
+  { id: "home", label: "Início", icon: Home, component: HomeSlide as typeof HomeSlide | EmbeddedSlideComponent },
+  { id: "lancamentos", label: "Lançamentos", icon: Wallet, component: LancamentosPage as EmbeddedSlideComponent },
+  { id: "resumo", label: "Resumo", icon: PieChart, component: ResumoPage as EmbeddedSlideComponent },
+  { id: "graficos", label: "Gráficos", icon: BarChart2, component: GraficosPage as EmbeddedSlideComponent },
+  { id: "ia", label: "IA", icon: MessageCircle, component: IAPage as EmbeddedSlideComponent },
 ];
 
 function CarouselInner() {
@@ -56,7 +58,7 @@ function CarouselInner() {
       <header className="sticky top-0 z-20 bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-[var(--color-border)] safe-area-inset-top">
         <div className="flex items-center justify-between h-14 px-4 max-w-2xl mx-auto">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-[5px] shrink-0" width={32} height={32} />
+            <Image src="/icon-192.png" alt="" className="rounded-[5px] shrink-0" width={32} height={32} />
             <span className="text-xl font-bold tracking-tight text-white">Pulse</span>
             <span className="text-[var(--color-text-muted)] text-sm font-normal hidden sm:inline">— finanças em ritmo</span>
           </Link>

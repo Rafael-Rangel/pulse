@@ -103,7 +103,7 @@ export default function HomeSlide() {
                     >
                       <XAxis type="number" hide />
                       <YAxis type="category" dataKey="categoria" width={72} tick={{ fontSize: 10 }} stroke="#a3a3a3" />
-                      <Tooltip formatter={(v: number) => [fmt(v), "Gasto"]} contentStyle={{ fontSize: 12 }} />
+                      <Tooltip formatter={(v) => [typeof v === "number" ? fmt(v) : v, "Gasto"]} contentStyle={{ fontSize: 12 }} />
                       <Bar dataKey="gasto" fill="#facc15" radius={4} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -122,7 +122,7 @@ export default function HomeSlide() {
                       <CartesianGrid strokeDasharray="3 3" stroke="#404040" />
                       <XAxis dataKey="data" stroke="#a3a3a3" fontSize={9} />
                       <YAxis stroke="#a3a3a3" fontSize={9} tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : String(v))} />
-                      <Tooltip formatter={(v: number) => [fmt(v), "Saldo"]} labelFormatter={(l) => l} />
+                      <Tooltip formatter={(v) => [typeof v === "number" ? fmt(v) : v, "Saldo"]} labelFormatter={(l) => l} />
                       <Line type="monotone" dataKey="saldo" stroke="#22c55e" strokeWidth={2} dot={false} />
                     </LineChart>
                   </ResponsiveContainer>
@@ -160,7 +160,7 @@ export default function HomeSlide() {
               { label: "Já gastou", value: fmt(resumo.totalGasto), Icon: Receipt, color: "text-warning" },
               { label: "Saldo", value: fmt(resumo.saldoFinal), Icon: TrendingUp, color: resumo.saldoFinal >= 0 ? "text-success" : "text-error" },
               { label: "% usado", value: `${(resumo.percentualUsado * 100).toFixed(0)}%`, Icon: Percent, color: "text-white" },
-            ].map((item, i) => (
+            ].map((item) => (
               <div key={item.label} className="animate-in stagger-3 rounded-xl bg-surface border border-[var(--color-border)] p-4 flex flex-col gap-1">
                 <div className="flex items-center gap-2 text-[var(--color-text-muted)] text-sm">
                   <item.Icon className="size-4 shrink-0" aria-hidden />

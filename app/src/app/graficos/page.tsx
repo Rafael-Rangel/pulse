@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Nav from "../components/Nav";
 import { LineChart as LineChartIcon } from "lucide-react";
 import {
@@ -27,7 +27,8 @@ const COLORS = ["#facc15", "#fef08a", "#f5f5f5", "#a3a3a3", "#22c55e", "#f59e0b"
 const fmt = (n: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(n);
 
-export default function GraficosPage({ embedded }: { embedded?: boolean } = {}) {
+function GraficosPageInner(props: { embedded?: boolean }) {
+  const { embedded } = props;
   const [calendario, setCalendario] = useState<DiaCalendario[]>([]);
   const [resumo, setResumo] = useState<ResumoMensal | null>(null);
 
@@ -147,3 +148,9 @@ export default function GraficosPage({ embedded }: { embedded?: boolean } = {}) 
     </div>
   );
 }
+
+function GraficosPage(props: { embedded?: boolean } & Record<string, unknown>) {
+  return <GraficosPageInner embedded={"embedded" in props ? props.embedded : undefined} />;
+}
+// Next.js App Router expects a specific page props type; this component also accepts embedded for carousel use
+export default GraficosPage as React.FC;

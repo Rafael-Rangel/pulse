@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Nav from "../components/Nav";
 import { PieChart, Wallet, Receipt, TrendingUp, Percent, Table2, AlertTriangle } from "lucide-react";
 import type { ResumoMensal } from "@/lib/types";
@@ -8,7 +8,8 @@ import type { ResumoMensal } from "@/lib/types";
 const fmt = (n: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n);
 
-export default function ResumoPage({ embedded }: { embedded?: boolean } = {}) {
+function ResumoPageInner(props: { embedded?: boolean }) {
+  const { embedded } = props;
   const [resumo, setResumo] = useState<ResumoMensal | null>(null);
 
   useEffect(() => {
@@ -137,3 +138,8 @@ export default function ResumoPage({ embedded }: { embedded?: boolean } = {}) {
     </div>
   );
 }
+
+function ResumoPage(props: { embedded?: boolean } & Record<string, unknown>) {
+  return <ResumoPageInner embedded={"embedded" in props ? props.embedded : undefined} />;
+}
+export default ResumoPage as React.FC;

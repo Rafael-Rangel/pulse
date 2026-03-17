@@ -86,6 +86,7 @@ export default function ConfigPage() {
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- save is stable, avoid loop
   }, [config]);
 
   // Salvar ao sair da página (navegação ou fechar aba)
@@ -434,7 +435,7 @@ export default function ConfigPage() {
         </section>
 
         <button
-          onClick={save}
+          onClick={() => save()}
           disabled={saving}
           className="animate-in stagger-5 btn-interactive w-full py-3.5 bg-primary hover:bg-primary-hover rounded-xl font-semibold text-white disabled:opacity-50 transition-colors duration-fast"
         >

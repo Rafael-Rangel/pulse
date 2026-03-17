@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Nav from "../components/Nav";
 import { Wallet, PlusCircle, List, ChevronDown, X } from "lucide-react";
 import { CATEGORIAS, TIPOS_LANCAMENTO, MEIOS_PAGAMENTO } from "@/lib/types";
@@ -22,7 +22,8 @@ function groupByData(list: Lancamento[]): { data: string; items: Lancamento[] }[
     .map(([data, items]) => ({ data, items }));
 }
 
-export default function LancamentosPage({ embedded }: { embedded?: boolean } = {}) {
+function LancamentosPageInner(props: { embedded?: boolean }) {
+  const { embedded } = props;
   const [list, setList] = useState<Lancamento[]>([]);
   const [categoriasList, setCategoriasList] = useState<string[]>([]);
   const [form, setForm] = useState<Partial<Lancamento>>({
@@ -186,3 +187,8 @@ export default function LancamentosPage({ embedded }: { embedded?: boolean } = {
     </div>
   );
 }
+
+function LancamentosPage(props: { embedded?: boolean } & Record<string, unknown>) {
+  return <LancamentosPageInner embedded={"embedded" in props ? props.embedded : undefined} />;
+}
+export default LancamentosPage as React.FC;

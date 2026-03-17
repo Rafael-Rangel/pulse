@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Home,
@@ -28,7 +29,7 @@ export default function Nav() {
       <header className="sticky top-0 z-20 bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-[var(--color-border)] safe-area-inset-top">
         <div className="flex items-center justify-between h-14 px-4 max-w-2xl mx-auto">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/icon-192.png" alt="" className="w-8 h-8 rounded-[5px] shrink-0" width={32} height={32} />
+            <Image src="/icon-192.png" alt="" className="rounded-[5px] shrink-0" width={32} height={32} />
             <span className="text-xl font-bold tracking-tight text-white">
               Pulse
             </span>
