@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Nav from "../components/Nav";
-import { Wallet, PlusCircle, List, ChevronDown, X } from "lucide-react";
+import { Wallet, PlusCircle, List, ChevronDown, X, Pencil, Trash2 } from "lucide-react";
 import { CATEGORIAS, TIPOS_LANCAMENTO, MEIOS_PAGAMENTO } from "@/lib/types";
 import type { Lancamento } from "@/lib/types";
 import { formatDateDDMMYYYY } from "@/lib/format";
@@ -32,6 +32,8 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
   });
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = () => fetch("/api/lancamentos").then((r) => r.json()).then(setList);
 
@@ -55,20 +57,70 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
     }
     setSaving(true);
     try {
-      const res = await fetch("/api/lancamentos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        setForm({ data: form.data, tipo: "Variável" });
-        setForm((f) => ({ ...f, descricao: "", valor: undefined }));
-        setShowForm(false);
-        load();
-      } else alert(data.error || "Erro ao salvar");
+      if (editingId) {
+        const res = await fetch(`/api/lancamentos/${editingId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setEditingId(null);
+          setShowForm(false);
+          setForm({ data: form.data, tipo: "Variável" });
+          setForm((f) => ({ ...f, descricao: "", valor: undefined }));
+          load();
+        } else alert(data.error || "Erro ao atualizar");
+      } else {
+        const res = await fetch("/api/lancamentos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setForm({ data: form.data, tipo: "Variável" });
+          setForm((f) => ({ ...f, descricao: "", valor: undefined }));
+          setShowForm(false);
+          load();
+        } else alert(data.error || "Erro ao salvar");
+      }
     } finally {
       setSaving(false);
+    }
+  };
+
+  const openEdit = (l: Lancamento) => {
+    if (!l.id) return;
+    setEditingId(l.id);
+    setForm({
+      data: l.data,
+      descricao: l.descricao,
+      categoria: l.categoria,
+      tipo: l.tipo,
+      valor: l.valor,
+      meioPagamento: l.meioPagamento,
+    });
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setForm({ data: form.data ?? new Date().toISOString().slice(0, 10), tipo: "Variável" });
+    setForm((f) => ({ ...f, descricao: "", valor: undefined }));
+  };
+
+  const deleteLancamento = async (id: string) => {
+    if (!confirm("Excluir este lançamento? Não é possível desfazer.")) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/lancamentos/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.ok) load();
+      else alert(data.error || "Erro ao excluir");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -76,10 +128,13 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
     <form onSubmit={submit} className="animate-panel-in bg-surface rounded-xl p-5 border border-[var(--color-border)] space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-[var(--color-text)] flex items-center gap-2">
-          <PlusCircle className="size-4 shrink-0 text-primary" aria-hidden />
-          Novo gasto ou receita
+          {editingId ? (
+            <> <Pencil className="size-4 shrink-0 text-primary" aria-hidden /> Editar lançamento </>
+          ) : (
+            <> <PlusCircle className="size-4 shrink-0 text-primary" aria-hidden /> Novo gasto ou receita </>
+          )}
         </h2>
-        <button type="button" onClick={() => setShowForm(false)} className="btn-interactive p-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]" aria-label="Fechar">
+        <button type="button" onClick={closeForm} className="btn-interactive p-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-surface-elevated)]" aria-label="Fechar">
           <X className="size-5" />
         </button>
       </div>
@@ -105,7 +160,7 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
           {MEIOS_PAGAMENTO.map((m) => <option key={m} value={m}>{m}</option>)}
         </select>
       </div>
-      <button type="submit" disabled={saving} className="btn-interactive w-full py-3.5 bg-primary hover:bg-primary-hover rounded-xl font-semibold text-white disabled:opacity-50 transition-colors">{saving ? "Salvando..." : "Anotar"}</button>
+      <button type="submit" disabled={saving} className="btn-interactive w-full py-3.5 bg-primary hover:bg-primary-hover rounded-xl font-semibold text-white disabled:opacity-50 transition-colors">{saving ? "Salvando..." : editingId ? "Salvar alterações" : "Anotar"}</button>
     </form>
   );
 
@@ -126,9 +181,33 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
               <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">{formatDateDDMMYYYY(group.data)}</p>
             </div>
             {group.items.map((l) => (
-              <div key={l.id ?? l.data + l.descricao + l.valor} className="flex justify-between items-center px-4 py-2 text-sm">
-                <span className="text-[var(--color-text)]">{l.descricao} <span className="text-[var(--color-text-muted)]">({l.categoria})</span></span>
-                <span className="text-warning font-semibold tabular-nums">{fmt(l.valor)}</span>
+              <div key={l.id ?? l.data + l.descricao + l.valor} className="flex justify-between items-center gap-2 px-4 py-2 text-sm group/item">
+                <span className="flex-1 min-w-0">
+                  <span className="text-[var(--color-text)]">{l.descricao}</span>
+                  <span className="text-[var(--color-text-muted)]"> ({l.categoria})</span>
+                </span>
+                <span className="text-warning font-semibold tabular-nums shrink-0">{fmt(l.valor)}</span>
+                {l.id && (
+                  <span className="flex shrink-0 gap-0.5 opacity-70 group-hover/item:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(l)}
+                      className="btn-interactive p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-primary hover:bg-primary/10"
+                      aria-label="Editar"
+                    >
+                      <Pencil className="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteLancamento(l.id!)}
+                      disabled={deletingId === l.id}
+                      className="btn-interactive p-1.5 rounded-lg text-[var(--color-text-muted)] hover:text-error hover:bg-error/10 disabled:opacity-50"
+                      aria-label="Excluir"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </span>
+                )}
               </div>
             ))}
           </div>

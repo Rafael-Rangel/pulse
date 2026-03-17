@@ -290,65 +290,99 @@ export default function ConfigPage() {
         </section>
 
         <section className="animate-in stagger-3 bg-surface rounded-xl p-5 border border-[var(--color-border)]">
-          <h2 className="font-semibold text-[var(--color-text)] mb-2">Gerenciar categorias</h2>
-          <p className="text-sm text-[var(--color-text-muted)] mb-3">Crie, edite ou exclua categorias. Excluir só oculta a categoria (não apaga lançamentos).</p>
-          <ul className="space-y-2 mb-4">
+          <div className="mb-4">
+            <h2 className="font-semibold text-[var(--color-text)] flex items-center gap-2">
+              <PlusCircle className="size-5 shrink-0 text-primary" aria-hidden />
+              Gerenciar categorias
+            </h2>
+            <p className="text-sm text-[var(--color-text-muted)] mt-1">
+              Crie, edite ou exclua categorias. Excluir só oculta a categoria (não apaga lançamentos).
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             {categoriasApi.map((c) => (
-              <li key={c.id} className="flex items-center gap-2 flex-wrap">
+              <div
+                key={c.id}
+                className={`rounded-xl border p-4 transition-colors ${
+                  editId === c.id
+                    ? "border-primary/50 bg-primary/5"
+                    : "border-[var(--color-border)]/70 bg-[var(--color-bg)]/50 hover:border-[var(--color-border)]"
+                }`}
+              >
                 {editId === c.id ? (
-                  <>
+                  <div className="space-y-3">
                     <input
                       type="text"
-                      className="flex-1 min-w-0 bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-md px-3 py-2 text-sm text-[var(--color-text)] focus:ring-2 focus:ring-primary outline-none"
+                      className="w-full bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] focus:ring-2 focus:ring-primary outline-none"
                       value={editNome}
                       onChange={(e) => setEditNome(e.target.value)}
-                      placeholder="Nome"
+                      placeholder="Nome da categoria"
                     />
                     <select
-                      className="bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-md px-3 py-2 text-sm text-[var(--color-text)] focus:ring-2 focus:ring-primary outline-none"
+                      className="w-full bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] focus:ring-2 focus:ring-primary outline-none"
                       value={editTipo}
                       onChange={(e) => setEditTipo(e.target.value as "Fixo" | "Variável")}
                     >
                       <option value="Fixo">Fixo</option>
                       <option value="Variável">Variável</option>
                     </select>
-                    <button type="button" onClick={saveEditCategoria} className="btn-interactive px-3 py-1.5 bg-primary hover:bg-primary-hover rounded-md text-sm font-medium text-white transition-colors">Salvar</button>
-                    <button type="button" onClick={() => setEditId(null)} className="btn-interactive px-3 py-1.5 bg-surface border border-[var(--color-border)] rounded-md text-sm text-[var(--color-text)] hover:bg-[var(--color-surface-elevated)] transition-colors">Cancelar</button>
-                  </>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={saveEditCategoria} className="btn-interactive flex-1 px-3 py-2 bg-primary hover:bg-primary-hover rounded-lg text-sm font-medium text-white transition-colors">
+                        Salvar
+                      </button>
+                      <button type="button" onClick={() => setEditId(null)} className="btn-interactive px-3 py-2 bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text)] hover:bg-[var(--color-border)]/30 transition-colors">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
                 ) : (
-                  <>
-                    <span className="font-medium text-[var(--color-text)]">{c.nome}</span>
-                    <span className="text-xs text-[var(--color-text-subtle)]">({c.tipo})</span>
-                    <button type="button" onClick={() => { setEditId(c.id); setEditNome(c.nome); setEditTipo(c.tipo); }} className="btn-interactive p-1.5 text-[var(--color-text-muted)] hover:text-primary rounded-lg hover:bg-primary/10 transition-colors" aria-label="Editar">
-                      <Pencil className="size-4" />
-                    </button>
-                    <button type="button" onClick={() => excluirCategoria(c.id)} className="btn-interactive p-1.5 text-[var(--color-text-muted)] hover:text-error rounded-lg hover:bg-error/10 transition-colors" aria-label="Excluir">
-                      <Trash2 className="size-4" />
-                    </button>
-                  </>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-[var(--color-text)] truncate">{c.nome}</p>
+                      <span className={`inline-block mt-1 text-xs font-medium px-2 py-0.5 rounded-full ${c.tipo === "Fixo" ? "bg-primary/20 text-primary" : "bg-secondary/20 text-secondary"}`}>
+                        {c.tipo}
+                      </span>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
+                      <button type="button" onClick={() => { setEditId(c.id); setEditNome(c.nome); setEditTipo(c.tipo); }} className="btn-interactive p-2 rounded-lg text-[var(--color-text-muted)] hover:text-primary hover:bg-primary/10 transition-colors" aria-label="Editar">
+                        <Pencil className="size-4" />
+                      </button>
+                      <button type="button" onClick={() => excluirCategoria(c.id)} className="btn-interactive p-2 rounded-lg text-[var(--color-text-muted)] hover:text-error hover:bg-error/10 transition-colors" aria-label="Excluir">
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                  </div>
                 )}
-              </li>
+              </div>
             ))}
-          </ul>
-          <div className="flex flex-wrap gap-2 items-center">
-            <input
-              type="text"
-              className="bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-md px-3 py-2 text-sm w-40 text-[var(--color-text)] placeholder-[var(--color-text-subtle)] focus:ring-2 focus:ring-primary outline-none"
-              value={novoNome}
-              onChange={(e) => setNovoNome(e.target.value)}
-              placeholder="Nova categoria"
-            />
-            <select
-              className="bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-md px-3 py-2 text-sm text-[var(--color-text)] focus:ring-2 focus:ring-primary outline-none"
-              value={novoTipo}
-              onChange={(e) => setNovoTipo(e.target.value as "Fixo" | "Variável")}
-            >
-              <option value="Fixo">Fixo</option>
-              <option value="Variável">Variável</option>
-            </select>
-            <button type="button" onClick={addCategoria} className="btn-interactive inline-flex items-center gap-1 px-3 py-2 bg-secondary hover:bg-secondary-hover rounded-md text-sm font-medium text-black transition-colors">
-              <PlusCircle className="size-4" /> Adicionar
-            </button>
+          </div>
+
+          <div className="rounded-xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-bg)]/30 p-4">
+            <p className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Nova categoria</p>
+            <div className="flex flex-wrap gap-2 items-end">
+              <label className="sr-only">Nome</label>
+              <input
+                type="text"
+                className="flex-1 min-w-[140px] bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text)] placeholder-[var(--color-text-subtle)] focus:ring-2 focus:ring-primary outline-none"
+                value={novoNome}
+                onChange={(e) => setNovoNome(e.target.value)}
+                placeholder="Ex: Alimentação"
+              />
+              <label className="sr-only">Tipo</label>
+              <select
+                className="bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text)] focus:ring-2 focus:ring-primary outline-none w-28"
+                value={novoTipo}
+                onChange={(e) => setNovoTipo(e.target.value as "Fixo" | "Variável")}
+              >
+                <option value="Fixo">Fixo</option>
+                <option value="Variável">Variável</option>
+              </select>
+              <button type="button" onClick={addCategoria} className="btn-interactive inline-flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover rounded-lg text-sm font-medium text-white transition-colors">
+                <PlusCircle className="size-4" aria-hidden />
+                Adicionar
+              </button>
+            </div>
           </div>
         </section>
 

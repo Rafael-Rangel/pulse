@@ -10,11 +10,21 @@ export default function PageTransition({
 }) {
   const pathname = usePathname();
 
-  // Sempre que mudar de página, voltar ao topo (e scroll horizontal a zero)
+  // Sempre que mudar de página (link/clique), levar o usuário ao topo (como um link #)
   useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollLeft = 0;
-    document.body.scrollLeft = 0;
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      document.documentElement.scrollTop = 0;
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollTop = 0;
+      document.body.scrollLeft = 0;
+    };
+    scrollToTop();
+    // Garante após o paint da nova página (caso o router atualize o DOM depois)
+    const raf = requestAnimationFrame(() => {
+      scrollToTop();
+    });
+    return () => cancelAnimationFrame(raf);
   }, [pathname]);
 
   return (

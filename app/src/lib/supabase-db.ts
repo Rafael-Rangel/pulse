@@ -305,6 +305,45 @@ export async function appendLancamento(
   return !error;
 }
 
+export async function updateLancamento(
+  id: number,
+  lanc: Lancamento
+): Promise<{ ok: boolean; error?: string }> {
+  if (!supabase) return { ok: false, error: "Supabase não configurado" };
+
+  const { data: cat } = await supabase
+    .from("categorias")
+    .select("id")
+    .eq("nome", lanc.categoria)
+    .maybeSingle();
+  if (!cat?.id) return { ok: false, error: "Categoria inválida" };
+
+  const { error } = await supabase
+    .from("lancamentos")
+    .update({
+      data: lanc.data,
+      descricao: lanc.descricao,
+      categoria_id: cat.id,
+      subcategoria: lanc.subcategoria ?? null,
+      tipo: lanc.tipo,
+      valor: lanc.valor,
+      meio_pagamento: lanc.meioPagamento ?? null,
+      observacoes: lanc.observacoes ?? null,
+      usa_renda_extra: lanc.tipo === "Extra",
+    })
+    .eq("id", id);
+
+  if (error) return { ok: false, error: error.message ?? "Erro ao atualizar" };
+  return { ok: true };
+}
+
+export async function deleteLancamento(id: number): Promise<{ ok: boolean; error?: string }> {
+  if (!supabase) return { ok: false, error: "Supabase não configurado" };
+  const { error } = await supabase.from("lancamentos").delete().eq("id", id);
+  if (error) return { ok: false, error: error.message ?? "Erro ao excluir" };
+  return { ok: true };
+}
+
 /** Garante que o mês atual existe no banco (seed). */
 export async function seedMesAtual(): Promise<{ ok: boolean; error?: string }> {
   if (!supabase) return { ok: false, error: "Supabase não configurado" };
