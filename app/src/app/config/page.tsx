@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Nav from "../components/Nav";
 import { Settings, Save, PlusCircle, Pencil, Trash2, Percent, CircleDollarSign, Target } from "lucide-react";
 import type { ConfigMes } from "@/lib/types";
+import { useDialog } from "../components/DialogProvider";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n);
@@ -16,6 +17,7 @@ interface CategoriaApi {
 }
 
 export default function ConfigPage() {
+  const dialog = useDialog();
   const [config, setConfig] = useState<ConfigMes | null>(null);
   const [saving, setSaving] = useState(false);
   const [categoriasApi, setCategoriasApi] = useState<CategoriaApi[]>([]);
@@ -65,7 +67,7 @@ export default function ConfigPage() {
         }),
       });
       const data = await res.json();
-      if (!data.ok) alert(data.error || "Erro ao salvar");
+      if (!data.ok) await dialog.alert(data.error || "Erro ao salvar", { title: "Não foi possível salvar" });
       else {
         hasEditedRef.current = false;
         loadConfig();
@@ -163,7 +165,7 @@ export default function ConfigPage() {
       body: JSON.stringify({ nome, tipo: novoTipo }),
     });
     const data = await res.json();
-    if (!data.ok) alert(data.error || "Erro ao criar categoria");
+    if (!data.ok) await dialog.alert(data.error || "Erro ao criar categoria", { title: "Erro" });
     else {
       setNovoNome("");
       setNovoTipo("Variável");
@@ -180,7 +182,7 @@ export default function ConfigPage() {
       body: JSON.stringify({ nome: editNome.trim(), tipo: editTipo }),
     });
     const data = await res.json();
-    if (!data.ok) alert(data.error || "Erro ao atualizar");
+    if (!data.ok) await dialog.alert(data.error || "Erro ao atualizar", { title: "Erro" });
     else {
       setEditId(null);
       loadCategorias();
@@ -189,10 +191,14 @@ export default function ConfigPage() {
   };
 
   const excluirCategoria = async (id: number) => {
-    if (!confirm("Excluir esta categoria? Ela deixará de aparecer no app (lançamentos antigos continuam vinculados).")) return;
+    const ok = await dialog.confirm(
+      "Excluir esta categoria? Ela deixará de aparecer no app (lançamentos antigos continuam vinculados).",
+      { title: "Excluir categoria", confirmText: "Excluir", destructive: true }
+    );
+    if (!ok) return;
     const res = await fetch(`/api/categorias/${id}`, { method: "DELETE" });
     const data = await res.json();
-    if (!data.ok) alert(data.error || "Erro ao excluir");
+    if (!data.ok) await dialog.alert(data.error || "Erro ao excluir", { title: "Erro" });
     else {
       loadCategorias();
       loadConfig();

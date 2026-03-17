@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import PageTransition from "./components/PageTransition";
+import DialogProvider from "./components/DialogProvider";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -36,7 +37,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={plusJakarta.variable}>
       <body className="bg-[var(--color-bg)] text-[var(--color-text)] font-sans antialiased">
-        <PageTransition>{children}</PageTransition>
+        <DialogProvider>
+          <PageTransition>{children}</PageTransition>
+        </DialogProvider>
       </body>
     </html>
   );

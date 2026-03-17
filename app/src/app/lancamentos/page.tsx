@@ -7,6 +7,7 @@ import { Wallet, PlusCircle, List, ChevronDown, X, Pencil, Trash2 } from "lucide
 import { CATEGORIAS, TIPOS_LANCAMENTO, MEIOS_PAGAMENTO } from "@/lib/types";
 import type { Lancamento } from "@/lib/types";
 import { formatDateDDMMYYYY } from "@/lib/format";
+import { useDialog } from "../components/DialogProvider";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n);
@@ -26,6 +27,7 @@ function groupByData(list: Lancamento[]): { data: string; items: Lancamento[] }[
 function LancamentosPageInner(props: { embedded?: boolean }) {
   const { embedded } = props;
   const searchParams = useSearchParams();
+  const dialog = useDialog();
   const [list, setList] = useState<Lancamento[]>([]);
   const [categoriasList, setCategoriasList] = useState<string[]>([]);
   const [form, setForm] = useState<Partial<Lancamento>>({
@@ -59,7 +61,7 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.data || !form.descricao || form.valor == null) {
-      alert("Preencha data, descrição e valor.");
+      await dialog.alert("Preencha data, descrição e valor.", { title: "Campos obrigatórios" });
       return;
     }
     setSaving(true);
@@ -77,7 +79,7 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
           setForm({ data: form.data, tipo: "Variável" });
           setForm((f) => ({ ...f, descricao: "", valor: undefined }));
           load();
-        } else alert(data.error || "Erro ao atualizar");
+        } else await dialog.alert(data.error || "Erro ao atualizar", { title: "Erro" });
       } else {
         const res = await fetch("/api/lancamentos", {
           method: "POST",
@@ -90,7 +92,7 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
           setForm((f) => ({ ...f, descricao: "", valor: undefined }));
           setShowForm(false);
           load();
-        } else alert(data.error || "Erro ao salvar");
+        } else await dialog.alert(data.error || "Erro ao salvar", { title: "Erro" });
       }
     } finally {
       setSaving(false);
@@ -119,13 +121,18 @@ function LancamentosPageInner(props: { embedded?: boolean }) {
   };
 
   const deleteLancamento = async (id: string) => {
-    if (!confirm("Excluir este lançamento? Não é possível desfazer.")) return;
+    const ok = await dialog.confirm("Excluir este lançamento? Não é possível desfazer.", {
+      title: "Excluir lançamento",
+      confirmText: "Excluir",
+      destructive: true,
+    });
+    if (!ok) return;
     setDeletingId(id);
     try {
       const res = await fetch(`/api/lancamentos/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.ok) load();
-      else alert(data.error || "Erro ao excluir");
+      else await dialog.alert(data.error || "Erro ao excluir", { title: "Erro" });
     } finally {
       setDeletingId(null);
     }
